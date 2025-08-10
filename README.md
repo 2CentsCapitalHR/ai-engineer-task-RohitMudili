@@ -6,6 +6,13 @@ An AI-powered corporate document analysis and compliance checking tool for ADGM 
 
 The ADGM Corporate Agent is designed to help corporate service providers and legal professionals ensure compliance with ADGM regulations. It automatically analyzes corporate documents, detects compliance issues, and generates comprehensive reports with citations to regulatory sources.
 
+## Output As requested 
+
+<img width="1918" height="783" alt="Screenshot 2025-08-10 173916" src="https://github.com/user-attachments/assets/b7fc49e7-5ec3-43cc-b011-976df018e62a" /><img width="1918" height="677" alt="Screenshot 2025-08-10 173935" src="https://github.com/user-attachments/assets/046c58a4-5d23-4eb5-b23c-5c0d06d46b48" />
+
+<img width="1918" height="930" alt="Screenshot 2025-08-10 173957" src="https://github.com/user-attachments/assets/0b20e9d1-abab-49d2-90ac-16952760853f" />
+
+
 ## ✨ Features
 
 - **Document Analysis**: Automatically analyze corporate documents for compliance issues
