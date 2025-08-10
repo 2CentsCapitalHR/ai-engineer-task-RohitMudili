@@ -7,6 +7,10 @@ import os
 import sys
 import subprocess
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def check_dependencies():
     """Check if required dependencies are installed"""

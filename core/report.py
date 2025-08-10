@@ -8,7 +8,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 from .utils import setup_logging, load_yaml_config
 
-logger = setup_logging(__name__)
+logger = setup_logging()
 
 # Pydantic models for structured output
 class Issue(BaseModel):

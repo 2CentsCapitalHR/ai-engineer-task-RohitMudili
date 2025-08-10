@@ -2,13 +2,12 @@ import os
 import chromadb
 from typing import List, Dict, Any, Optional, Tuple
 import numpy as np
-from sentence_transformers import SentenceTransformer
-from bge_reranker import BGEReranker
+import openai
 import logging
 
 from .utils import setup_logging, load_yaml_config
 
-logger = setup_logging(__name__)
+logger = setup_logging()
 
 class DocumentRetriever:
     def __init__(self, chroma_path: str = "chroma_db", config_path: str = "config/settings.yml"):
@@ -19,11 +18,13 @@ class DocumentRetriever:
         self.client = chromadb.PersistentClient(path=chroma_path)
         self.collection = self.client.get_collection("adgm_documents")
         
-        # Initialize embedding model
-        self.embedding_model = SentenceTransformer('text-embedding-3-large')
+        # Initialize OpenAI client
+        self.openai_client = openai.OpenAI()
         
-        # Initialize reranker
-        self.reranker = BGEReranker('BAAI/bge-reranker-large')
+        # Configuration
+        self.top_k = self.config.get('rag', {}).get('top_k', 8)
+        self.rerank_k = self.config.get('rag', {}).get('rerank_k', 6)
+        self.min_score = self.config.get('rag', {}).get('min_score', 0.35)
         
         # Configuration
         self.top_k = self.config.get('rag', {}).get('top_k', 8)
@@ -31,10 +32,13 @@ class DocumentRetriever:
         self.min_score = self.config.get('rag', {}).get('min_score', 0.35)
     
     def embed_query(self, query: str) -> List[float]:
-        """Embed a query using the embedding model"""
+        """Embed a query using OpenAI's embedding model"""
         try:
-            embedding = self.embedding_model.encode(query)
-            return embedding.tolist()
+            response = self.openai_client.embeddings.create(
+                model="text-embedding-3-small",
+                input=query
+            )
+            return response.data[0].embedding
         except Exception as e:
             logger.error(f"Error embedding query: {e}")
             return []
@@ -82,7 +86,7 @@ class DocumentRetriever:
     
     def rerank_documents(self, query: str, documents: List[Dict[str, Any]], 
                         rerank_k: Optional[int] = None) -> List[Dict[str, Any]]:
-        """Rerank documents using BGE reranker"""
+        """Rerank documents using OpenAI's embedding similarity"""
         if rerank_k is None:
             rerank_k = self.rerank_k
         
@@ -90,17 +94,30 @@ class DocumentRetriever:
             return []
         
         try:
-            # Prepare documents for reranking
+            # Get embeddings for query and documents
+            query_embedding = self.embed_query(query)
+            if not query_embedding:
+                return documents[:rerank_k]
+            
+            # Get embeddings for all documents
             doc_texts = [doc['text'] for doc in documents]
+            doc_embeddings_response = self.openai_client.embeddings.create(
+                model="text-embedding-3-small",
+                input=doc_texts
+            )
+            doc_embeddings = [item.embedding for item in doc_embeddings_response.data]
             
-            # Rerank
-            rerank_scores = self.reranker.compute_score(query, doc_texts)
+            # Calculate cosine similarities
+            similarities = []
+            for doc_embedding in doc_embeddings:
+                similarity = self._cosine_similarity(query_embedding, doc_embedding)
+                similarities.append(similarity)
             
-            # Update documents with rerank scores
+            # Update documents with similarity scores
             for i, doc in enumerate(documents):
-                doc['rerank_score'] = rerank_scores[i]
+                doc['rerank_score'] = similarities[i]
             
-            # Sort by rerank score and take top k
+            # Sort by similarity score and take top k
             reranked_docs = sorted(documents, key=lambda x: x['rerank_score'], reverse=True)[:rerank_k]
             
             return reranked_docs
@@ -108,6 +125,18 @@ class DocumentRetriever:
         except Exception as e:
             logger.error(f"Error reranking documents: {e}")
             return documents[:rerank_k]  # Fallback to original order
+    
+    def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
+        """Calculate cosine similarity between two vectors"""
+        try:
+            vec1 = np.array(vec1)
+            vec2 = np.array(vec2)
+            dot_product = np.dot(vec1, vec2)
+            norm1 = np.linalg.norm(vec1)
+            norm2 = np.linalg.norm(vec2)
+            return dot_product / (norm1 * norm2)
+        except Exception:
+            return 0.0
     
     def filter_by_score(self, documents: List[Dict[str, Any]], 
                        min_score: Optional[float] = None) -> List[Dict[str, Any]]:
@@ -175,11 +204,9 @@ class DocumentRetriever:
     def search_by_tags(self, tags: List[str]) -> List[Dict[str, Any]]:
         """Search documents by tags"""
         try:
-            # Use ChromaDB's where clause to filter by tags
-            where_clause = {"tags": {"$in": tags}}
-            
+            # Since tags are stored as comma-separated strings, we need to search differently
+            # Get all documents and filter by tags
             results = self.collection.get(
-                where=where_clause,
                 include=['documents', 'metadatas']
             )
             
@@ -187,10 +214,14 @@ class DocumentRetriever:
             if results['documents']:
                 for i, doc in enumerate(results['documents']):
                     metadata = results['metadatas'][i] if results['metadatas'] else {}
-                    documents.append({
-                        'text': doc,
-                        'metadata': metadata
-                    })
+                    doc_tags = metadata.get('tags', '').split(',') if metadata.get('tags') else []
+                    
+                    # Check if any of the requested tags are in the document's tags
+                    if any(tag.strip() in doc_tags for tag in tags):
+                        documents.append({
+                            'text': doc,
+                            'metadata': metadata
+                        })
             
             return documents
             
@@ -210,7 +241,9 @@ class DocumentRetriever:
             if sample_results['metadatas']:
                 for metadata in sample_results['metadatas']:
                     if metadata and 'tags' in metadata:
-                        all_tags.extend(metadata['tags'])
+                        tags_str = metadata['tags']
+                        if tags_str:
+                            all_tags.extend([tag.strip() for tag in tags_str.split(',')])
             
             tag_counts = {}
             for tag in all_tags:

@@ -7,7 +7,7 @@ from pathlib import Path
 from .utils import setup_logging, load_yaml_config, safe_get
 from .retrieval import DocumentRetriever
 
-logger = setup_logging(__name__)
+logger = setup_logging()
 
 class ChecklistProcessor:
     def __init__(self, rules_path: str = "rules", config_path: str = "config/settings.yml"):
@@ -23,34 +23,59 @@ class ChecklistProcessor:
         checklists = {}
         checklists_dir = Path(self.rules_path) / "checklists"
         
+        logger.info(f"Loading checklists from: {checklists_dir}")
+        
         if checklists_dir.exists():
             for yaml_file in checklists_dir.glob("*.yml"):
                 if yaml_file.name != "redflags":  # Skip redflags directory
                     try:
+                        logger.info(f"Loading checklist: {yaml_file}")
                         checklist = load_yaml_config(str(yaml_file))
                         process_name = checklist.get("process", yaml_file.stem)
                         checklists[process_name] = checklist
+                        logger.info(f"Loaded checklist: {process_name} -> {checklist.get('entity_type', 'N/A')}")
                     except Exception as e:
                         logger.error(f"Error loading checklist {yaml_file}: {e}")
+        else:
+            logger.error(f"Checklists directory does not exist: {checklists_dir}")
         
+        logger.info(f"Total checklists loaded: {len(checklists)}")
         return checklists
     
     def get_applicable_checklist(self, process: str, entity_type: str) -> Optional[Dict[str, Any]]:
         """Get the applicable checklist for the detected process and entity type"""
+        logger.info(f"Looking for checklist: process='{process}', entity_type='{entity_type}'")
+        logger.info(f"Available checklists: {list(self.checklists.keys())}")
+        
         # First try exact match
         if process in self.checklists:
             checklist = self.checklists[process]
+            logger.info(f"Found exact process match: {process}")
             if self._checklist_applies(checklist, entity_type):
+                logger.info(f"Checklist applies to entity type: {entity_type}")
                 return checklist
+            else:
+                logger.warning(f"Checklist found but doesn't apply to entity type: {entity_type}")
         
         # Try partial matches
         for checklist_name, checklist in self.checklists.items():
             if (process.lower() in checklist_name.lower() or 
                 checklist_name.lower() in process.lower()):
+                logger.info(f"Found partial process match: {checklist_name}")
                 if self._checklist_applies(checklist, entity_type):
+                    logger.info(f"Checklist applies to entity type: {entity_type}")
                     return checklist
         
-        # Return default if no match found
+        # Try matching by checklist process field
+        for checklist_name, checklist in self.checklists.items():
+            checklist_process = checklist.get("process", "")
+            if checklist_process and process.lower() == checklist_process.lower():
+                logger.info(f"Found checklist by process field: {checklist_process}")
+                if self._checklist_applies(checklist, entity_type):
+                    logger.info(f"Checklist applies to entity type: {entity_type}")
+                    return checklist
+        
+        logger.warning(f"No applicable checklist found for process: {process}, entity_type: {entity_type}")
         return None
     
     def _checklist_applies(self, checklist: Dict[str, Any], entity_type: str) -> bool:

@@ -8,7 +8,7 @@ from pathlib import Path
 from .utils import setup_logging, load_yaml_config, clean_text, is_docx_file
 from .retrieval import DocumentRetriever
 
-logger = setup_logging(__name__)
+logger = setup_logging()
 
 class DocumentAnalyzer:
     def __init__(self, rules_path: str = "rules", config_path: str = "config/settings.yml"):

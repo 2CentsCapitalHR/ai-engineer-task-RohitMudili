@@ -11,7 +11,7 @@ from datetime import datetime
 
 from .utils import setup_logging, load_yaml_config, format_citation
 
-logger = setup_logging(__name__)
+logger = setup_logging()
 
 class DocumentCommenter:
     def __init__(self, config_path: str = "config/settings.yml"):

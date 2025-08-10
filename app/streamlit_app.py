@@ -19,7 +19,7 @@ from core.ingest import DocumentIngester
 from core.utils import setup_logging, is_docx_file
 
 # Setup logging
-logger = setup_logging(__name__)
+logger = setup_logging()
 
 # Page configuration
 st.set_page_config(
@@ -51,13 +51,16 @@ st.markdown("""
         border-radius: 0.5rem;
         border-left: 4px solid #1f77b4;
     }
-    .issue-card {
-        background-color: #fff3cd;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        border-left: 4px solid #ffc107;
-        margin-bottom: 1rem;
-    }
+         .issue-card {
+         background-color: #fff8e1;
+         padding: 1rem;
+         border-radius: 0.5rem;
+         border-left: 4px solid #ff9800;
+         margin-bottom: 1rem;
+         color: #2c3e50;
+         font-weight: 500;
+         box-shadow: 0 2px 4px rgba(255, 152, 0, 0.1);
+     }
     .success-card {
         background-color: #d1ecf1;
         padding: 1rem;
@@ -243,33 +246,19 @@ def analyze_documents(uploaded_files):
                 st.success("✅ No red flags detected!")
             
             # Step 4: Generate Report
-            st.markdown('<h3 class="sub-header">📋 Detailed Report</h3>', unsafe_allow_html=True)
+            st.markdown('<h3 class="sub-header">📋 Analysis Report</h3>', unsafe_allow_html=True)
             
             # Build comprehensive report
-            report = report_builder.build_report(analysis_result, checklist_result, redflags)
+            try:
+                report = report_builder.build_report(analysis_result, checklist_result, redflags)
+            except Exception as e:
+                st.error(f"❌ Error building report: {str(e)}")
+                import traceback
+                st.error(f"Full error: {traceback.format_exc()}")
+                return
             
-            # Display report sections
-            display_detailed_report(report, checklist_result)
-            
-            # Step 5: Document Comments
-            if redflags:
-                st.markdown('<h3 class="sub-header">📝 Document Comments</h3>', unsafe_allow_html=True)
-                
-                if st.button("Generate Commented Documents"):
-                    generate_commented_documents(file_paths, redflags, commenter)
-            
-            # Step 6: Export Results
-            st.markdown('<h3 class="sub-header">💾 Export Results</h3>', unsafe_allow_html=True)
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                if st.button("📄 Export JSON Report"):
-                    export_json_report(report, report_builder)
-            
-            with col2:
-                if st.button("📊 Export Summary"):
-                    export_summary_report(report, report_builder)
+            # Display JSON format report
+            display_json_report(report, checklist_result)
             
         except Exception as e:
             st.error(f"❌ Analysis failed: {str(e)}")
@@ -329,89 +318,29 @@ def display_redflags(redflags: List[Dict[str, Any]]):
         else:
             st.success("No low severity issues found!")
 
-def display_detailed_report(report, checklist_result):
-    """Display detailed report sections"""
+def display_json_report(report, checklist_result):
+    """Display report in JSON format"""
     
-    # Create tabs for different report sections
-    tab1, tab2, tab3, tab4 = st.tabs(["📋 Requirements", "📊 Compliance", "🔗 Sources", "📈 Summary"])
+    # Create the JSON structure as requested
+    json_report = {
+        "process": getattr(report, 'process', 'Unknown'),
+        "documents_uploaded": getattr(report, 'documents_uploaded', 0),
+        "required_documents": getattr(report, 'required_documents', 0),
+        "missing_document": getattr(report, 'missing_document', None),
+        "issues_found": [
+            {
+                "document": issue.document,
+                "section": issue.section,
+                "issue": issue.issue,
+                "severity": issue.severity,
+                "suggestion": issue.suggestion
+            }
+            for issue in getattr(report, 'issues_found', [])
+        ]
+    }
     
-    with tab1:
-        st.subheader("Requirements Analysis")
-        
-        requirements_analysis = checklist_result.get("requirement_analysis", {})
-        
-        # Found requirements
-        found_reqs = requirements_analysis.get("found_requirements", [])
-        if found_reqs:
-            st.success(f"✅ Found {len(found_reqs)} requirements:")
-            for req in found_reqs:
-                st.write(f"• {req['name']} (Confidence: {req.get('confidence', 0):.1%})")
-        
-        # Missing requirements
-        missing_reqs = requirements_analysis.get("missing_requirements", [])
-        if missing_reqs:
-            st.warning(f"⚠️ Missing {len(missing_reqs)} requirements:")
-            for req in missing_reqs:
-                priority = "🔴" if req.get("mandatory", True) else "🟡"
-                st.write(f"{priority} {req['name']}")
-    
-    with tab2:
-        st.subheader("Compliance Analysis")
-        
-        compliance_score = report.compliance_score
-        compliance_status = report.compliance_status
-        
-        # Compliance gauge
-        st.metric("Overall Compliance", f"{compliance_score:.1%}")
-        st.metric("Compliance Status", compliance_status)
-        
-        # Compliance breakdown
-        if compliance_score < 0.5:
-            st.error("⚠️ Low compliance - immediate action required")
-        elif compliance_score < 0.8:
-            st.warning("⚠️ Moderate compliance - review recommended")
-        else:
-            st.success("✅ Good compliance - minor issues only")
-    
-    with tab3:
-        st.subheader("Regulatory Sources")
-        
-        regulatory_context = report.regulatory_context
-        relevant_sources = regulatory_context.relevant_sources
-        
-        if relevant_sources:
-            st.write("Relevant regulatory sources:")
-            for source in relevant_sources:
-                st.write(f"• [{source.get('title', 'Unknown')}]({source.get('url', '#')})")
-        else:
-            st.info("No specific regulatory sources identified")
-    
-    with tab4:
-        st.subheader("Analysis Summary")
-        
-        summary_data = {
-            "Metric": [
-                "Process Type",
-                "Entity Type", 
-                "Documents Analyzed",
-                "Total Issues",
-                "Critical Issues",
-                "Missing Requirements",
-                "Compliance Score"
-            ],
-            "Value": [
-                report.process,
-                report.entity_type,
-                report.documents_uploaded,
-                len(report.issues_found),
-                len([i for i in report.issues_found if i.severity == "High"]),
-                len(report.suggestions),
-                f"{report.compliance_score:.1%}"
-            ]
-        }
-        
-        summary_df = pd.DataFrame(summary_data)
-        st.dataframe(summary_df, use_container_width=True)
+    # Display the JSON
+    st.json(json_report)
 
 def generate_commented_documents(file_paths: List[str], redflags: List[Dict[str, Any]], commenter: DocumentCommenter):
     """Generate commented versions of documents"""
@@ -452,38 +381,100 @@ def export_json_report(report, report_builder: ReportBuilder):
     """Export the full JSON report"""
     
     try:
-        # Create filename
-        filename = report_builder.create_report_filename(
-            report.process, 
-            report.entity_type
-        )
+        # Check if report is valid
+        if not report:
+            st.error("❌ No report data available")
+            return
         
-        # Save report
+        # Create a simple JSON report without using Pydantic serialization
+        simple_report = {
+            "process": getattr(report, 'process', 'Unknown'),
+            "entity_type": getattr(report, 'entity_type', 'Unknown'),
+            "documents_uploaded": getattr(report, 'documents_uploaded', 0),
+            "required_documents": getattr(report, 'required_documents', 0),
+            "missing_document": getattr(report, 'missing_document', None),
+            "compliance_score": getattr(report, 'compliance_score', 0.0),
+            "compliance_status": getattr(report, 'compliance_status', 'Unknown'),
+            "analysis_timestamp": getattr(report, 'analysis_timestamp', datetime.now().isoformat()),
+            "issues_found": [
+                {
+                    "document": issue.document,
+                    "section": issue.section,
+                    "issue": issue.issue,
+                    "severity": issue.severity,
+                    "suggestion": issue.suggestion
+                }
+                for issue in getattr(report, 'issues_found', [])
+            ],
+            "suggestions": [
+                {
+                    "requirement": suggestion.name,
+                    "mandatory": suggestion.mandatory,
+                    "priority": suggestion.priority,
+                    "estimated_time": suggestion.estimated_time,
+                    "sources": suggestion.sources,
+                    "notes": suggestion.notes
+                }
+                for suggestion in getattr(report, 'suggestions', [])
+            ],
+            "regulatory_context": {
+                "relevant_sources": getattr(report.regulatory_context, 'relevant_sources', []),
+                "key_regulations": getattr(report.regulatory_context, 'key_regulations', []),
+                "compliance_deadlines": getattr(report.regulatory_context, 'compliance_deadlines', [])
+            },
+            "citations": getattr(report, 'citations', [])
+        }
+        
+        # Create filename
+        filename = f"adgm_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        # Convert to JSON
+        report_json = json.dumps(simple_report, indent=2, ensure_ascii=False)
+        
+        # Save to file
         output_path = f"reports/{filename}"
-        report_builder.save_report(report, output_path)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(report_json)
         
         # Provide download
-        with open(output_path, "r") as f:
-            st.download_button(
-                label="📄 Download Full JSON Report",
-                data=f.read(),
-                file_name=filename,
-                mime="application/json"
-            )
+        st.download_button(
+            label="📄 Download Full JSON Report",
+            data=report_json,
+            file_name=filename,
+            mime="application/json"
+        )
         
         st.success("✅ Report exported successfully!")
         
     except Exception as e:
         st.error(f"❌ Error exporting report: {str(e)}")
+        import traceback
+        st.error(f"Full error: {traceback.format_exc()}")
 
 def export_summary_report(report, report_builder: ReportBuilder):
     """Export a summary report"""
     
     try:
-        summary = report_builder.generate_summary_report(report)
+        # Check if report is valid
+        if not report:
+            st.error("❌ No report data available")
+            return
+            
+        # Create a simple summary without using Pydantic serialization
+        summary = {
+            "process": getattr(report, 'process', 'Unknown'),
+            "entity_type": getattr(report, 'entity_type', 'Unknown'),
+            "compliance_status": getattr(report, 'compliance_status', 'Unknown'),
+            "compliance_score": getattr(report, 'compliance_score', 0.0),
+            "total_issues": len(getattr(report, 'issues_found', [])),
+            "critical_issues": len([i for i in getattr(report, 'issues_found', []) if getattr(i, 'severity', 'Medium') == "High"]),
+            "missing_requirements": len(getattr(report, 'suggestions', [])),
+            "key_missing_document": getattr(report, 'missing_document', None),
+            "analysis_timestamp": getattr(report, 'analysis_timestamp', datetime.now().isoformat())
+        }
         
         # Convert to JSON
-        summary_json = json.dumps(summary, indent=2)
+        summary_json = json.dumps(summary, indent=2, ensure_ascii=False)
         
         # Create filename
         filename = f"summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
@@ -499,6 +490,8 @@ def export_summary_report(report, report_builder: ReportBuilder):
         
     except Exception as e:
         st.error(f"❌ Error exporting summary: {str(e)}")
+        import traceback
+        st.error(f"Full error: {traceback.format_exc()}")
 
 def database_management_page():
     """Database management page"""

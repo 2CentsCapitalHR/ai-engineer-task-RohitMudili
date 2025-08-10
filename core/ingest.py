@@ -12,7 +12,7 @@ import logging
 
 from .utils import load_yaml_config, setup_logging, chunk_text, clean_text, get_project_root, ensure_directory
 
-logger = setup_logging(__name__)
+logger = setup_logging()
 
 class DocumentIngester:
     def __init__(self, sources_path: str = "ingest/sources.yml", chroma_path: str = "chroma_db"):
@@ -78,10 +78,14 @@ class DocumentIngester:
     
     def extract_metadata(self, source: Dict[str, Any], content: str) -> Dict[str, Any]:
         """Extract metadata from source and content"""
+        # Convert tags list to string for ChromaDB compatibility
+        tags = source.get("tags", [])
+        tags_str = ",".join(tags) if tags else ""
+        
         metadata = {
             "source_url": source["url"],
             "type": source["type"],
-            "tags": source.get("tags", []),
+            "tags": tags_str,
             "title": self._extract_title(content),
             "effective_date": self._extract_date(content),
             "published_date": datetime.now().isoformat(),
@@ -183,7 +187,14 @@ class DocumentIngester:
             ids = [doc["metadata"]["chunk_id"] for doc in all_documents]
             
             # Clear existing collection
-            self.collection.delete(where={})
+            try:
+                # Get all existing IDs first
+                existing_results = self.collection.get()
+                if existing_results['ids']:
+                    self.collection.delete(ids=existing_results['ids'])
+            except Exception as e:
+                logger.warning(f"Could not clear existing collection: {e}")
+                # Continue with adding new documents
             
             # Add new documents
             self.collection.add(
