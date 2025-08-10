@@ -1,0 +1,53 @@
+process: "Company Incorporation"
+entity_type: "Private Company Limited by Guarantee (Non-Financial)"
+version: "v1"
+notes: "Important: guarantee companies do not have share capital."
+requirements:
+  - name: "Incorporation Application Form"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  - name: "Articles of Association (Guarantee Model or Bespoke)"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://assets.adgm.com/download/assets/Private+Company+Limited+by+Guarantee+Non-Financial+Services+20231228.pdf/1e6186444b1a11ef94edde7a1988e667"
+
+  - name: "Members’ Guarantee Statement"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Amount each member undertakes to contribute"
+    sources:
+      - "https://assets.adgm.com/download/assets/Private+Company+Limited+by+Guarantee+Non-Financial+Services+20231228.pdf/1e6186444b1a11ef94edde7a1988e667"
+
+  - name: "Register of Members and Directors"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  - name: "UBO Declaration"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/setting-up"
+
+  - name: "KYC/Identification Pack"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  - name: "Registered Office Address Details"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/setting-up"
+
+  - name: "Fees Payment Receipt"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"

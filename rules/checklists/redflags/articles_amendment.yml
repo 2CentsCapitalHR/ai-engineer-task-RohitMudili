@@ -1,0 +1,26 @@
+version: "v1"
+scope: "Articles Amendment"
+rules:
+  special_resolution_threshold:
+    kind: "semantic_check"
+    trigger_if:
+      - "document_type == 'Shareholder Resolution'"
+    must_include_any:
+      - "special resolution"
+      - "75%"
+    message: "Amending AoA typically requires a special resolution (e.g., ≥75%)."
+    severity: "High"
+    applies_to_docs:
+      - "Shareholder Resolution"
+    citations:
+      - "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"
+
+  missing_blackline:
+    kind: "doc_set_check"
+    requires_docs:
+      - "Marked-up Articles of Association"
+    message: "Provide a blackline (marked-up) AoA showing changes."
+    severity: "Medium"
+    applies_if: "subprocess == 'Amendment of Articles'"
+    citations:
+      - "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"

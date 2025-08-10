@@ -1,0 +1,53 @@
+process: "Company Incorporation"
+entity_type: "Branch (Non-Financial)"
+version: "v1"
+notes: "Checklist for registering a non-financial branch of a foreign company."
+requirements:
+  - name: "Parent Company Constitutional Documents (MoA/AoA)"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Certified copies"
+    sources:
+      - "https://assets.adgm.com/download/assets/Branch-Non+Financial+Services+20231228.pdf/c5bd08c65a4411efb9d83a701912a93f"
+
+  - name: "Parent Company Board Resolution to Establish ADGM Branch"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Board resolution naming authorised signatory"
+    sources:
+      - "https://assets.adgm.com/download/assets/Branch-Non+Financial+Services+20231228.pdf/c5bd08c65a4411efb9d83a701912a93f"
+
+  - name: "Authorised Signatory Appointment"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Power of attorney/appointment letter"
+    sources:
+      - "https://assets.adgm.com/download/assets/Branch-Non+Financial+Services+20231228.pdf/c5bd08c65a4411efb9d83a701912a93f"
+
+  - name: "Registered Office Address (ADGM)"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Lease/registered office service"
+    sources:
+      - "https://www.adgm.com/setting-up"
+
+  - name: "Permitted Activities Statement"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Scope aligned to ADGM activity list"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  - name: "KYC/Identification Pack"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "IDs for authorised signatory; corporate KYC"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  - name: "Fees Payment Receipt"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "RA payment receipt"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"

@@ -1,0 +1,15 @@
+{
+    "process": "Company Incorporation",
+    "documents_uploaded": 4,
+    "required_documents": 5,
+    "missing_document": "Register of Members and Directors",
+    "issues_found": [
+      {
+        "document": "Articles of Association",
+        "section": "Clause 3.1",
+        "issue": "Jurisdiction clause does not specify ADGM",
+        "severity": "High",
+        "suggestion": "Update jurisdiction to ADGM Courts."
+      }
+    ]
+  }

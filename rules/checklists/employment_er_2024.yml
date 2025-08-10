@@ -1,0 +1,61 @@
+process: "Employment/HR"
+subprocess: "Standard Employment Contract (ER 2024)"
+version: "v1"
+effective: "2025-04-01"
+notes: "Checklist aligns to ADGM Employment Regulations 2024 core terms."
+requirements:
+  - name: "Parties and Job Details"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Employer legal name, employee full name, job title, start date"
+    sources:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  - name: "Working Hours and Place of Work"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Hours, location/remote terms"
+    sources:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  - name: "Compensation and Overtime Basis"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Salary, overtime eligibility and rate basis"
+    sources:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  - name: "Probation Period"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Length and terms consistent with ER 2024"
+    sources:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  - name: "Leave Entitlements"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Annual, sick, maternity/paternity; public holidays"
+    sources:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  - name: "Notice Period and Termination"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Notice lengths, termination for cause/without cause"
+    sources:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  - name: "Work Permit / TWP Obligations"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Employer obligation to maintain valid permits"
+    sources:
+      - "https://www.adgm.com/setting-up"
+
+  - name: "Data Protection and Special Category Data"
+    mandatory: false
+    applies_if: "processes_special_category_data == true"
+    evidence_hint: "Appropriate Policy Document (APD) referenced for special data"
+    sources:
+      - "https://assets.adgm.com/download/assets/ADGM+DPR+2021+Appropriate+Policy+Document.pdf/7ecdbb96595d11efb0e3b2d1816cb4a4"

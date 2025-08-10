@@ -1,0 +1,28 @@
+process: "Licensing"
+subprocess: "Non-Financial Licence"
+version: "v1"
+notes: "Skeleton—expand based on chosen activity codes."
+requirements:
+  - name: "Activity Selection and Description"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/setting-up"
+
+  - name: "Premises/Registered Office Confirmation"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/setting-up"
+
+  - name: "Responsible Individuals (if applicable)"
+    mandatory: false
+    applies_if: "activity_requires_responsible_individuals == true"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  - name: "Fees Payment Receipt"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"

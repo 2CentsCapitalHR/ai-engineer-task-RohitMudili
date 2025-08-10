@@ -1,0 +1,31 @@
+process: "Post-Registration"
+subprocess: "Amendment of Articles"
+version: "v1"
+notes: "Used when users upload AoA amendment or related shareholder resolutions."
+requirements:
+  - name: "Shareholders’ Special Resolution Approving Amendments"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Special resolution with >=75% approval if required"
+    sources:
+      - "https://www.adgm.com/operating-in-adgm/post-registration-services/letters-and-permits"
+
+  - name: "Marked-up Articles of Association (showing changes)"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Blackline/redline AoA"
+    sources:
+      - "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"
+
+  - name: "Clean Copy of Amended Articles"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"
+
+  - name: "Filing/Submission to RA"
+    mandatory: true
+    applies_if: "always"
+    evidence_hint: "Portal submission receipt"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"

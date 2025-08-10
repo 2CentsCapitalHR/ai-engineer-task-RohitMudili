@@ -1,0 +1,28 @@
+process: "Post-Registration"
+subprocess: "Annual and Event-Driven Filings"
+version: "v1"
+notes: "Use to remind entities of ongoing obligations."
+requirements:
+  - name: "Annual Accounts Filing (if applicable)"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/operating-in-adgm/obligations-of-adgm-registered-entities/annual-filings/annual-accounts"
+
+  - name: "Director/Secretary Changes Filing"
+    mandatory: false
+    applies_if: "changes_in_officers == true"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  - name: "Registered Address Change Notice"
+    mandatory: false
+    applies_if: "registered_office_changed == true"
+    sources:
+      - "https://www.adgm.com/operating-in-adgm/post-registration-services/letters-and-permits"
+
+  - name: "Shareholder/Capital Changes (if any)"
+    mandatory: false
+    applies_if: "share_or_member_changes == true"
+    sources:
+      - "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"

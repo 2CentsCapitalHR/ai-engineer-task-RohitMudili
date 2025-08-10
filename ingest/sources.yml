@@ -1,0 +1,34 @@
+# ingest/sources.yml
+sources:
+  - url: "https://www.adgm.com/registration-authority/registration-and-incorporation"
+    type: html
+    tags: ["incorporation","ra","guidance"]
+  - url: "https://www.adgm.com/setting-up"
+    type: html
+    tags: ["setup","onboarding"]
+  - url: "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+    type: html
+    tags: ["legal-framework","guidance"]
+  - url: "https://assets.adgm.com/download/assets/Branch-Non+Financial+Services+20231228.pdf/c5bd08c65a4411efb9d83a701912a93f"
+    type: pdf
+    tags: ["branch","non-financial"]
+  - url: "https://assets.adgm.com/download/assets/Private+Company+Limited+by+Guarantee+Non-Financial+Services+20231228.pdf/1e6186444b1a11ef94edde7a1988e667"
+    type: pdf
+    tags: ["guarantee","non-financial"]
+  - url: "https://assets.adgm.com/download/assets/ADGM+DPR+2021+Appropriate+Policy+Document.pdf/7ecdbb96595d11efb0e3b2d1816cb4a4"
+    type: pdf
+    tags: ["data-protection","APD"]
+  - url: "https://www.adgm.com/operating-in-adgm/obligations-of-adgm-registered-entities/annual-filings/annual-accounts"
+    type: html
+    tags: ["annual-filings","accounts"]
+  - url: "https://www.adgm.com/operating-in-adgm/post-registration-services/letters-and-permits"
+    type: html
+    tags: ["post-registration","letters-permits"]
+  - url: "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"
+    type: html
+    tags: ["rulebook","incorporation-package"]
+options:
+  chunk_size: 1000
+  chunk_overlap: 120
+  download_pdfs: true
+  normalize_html: true

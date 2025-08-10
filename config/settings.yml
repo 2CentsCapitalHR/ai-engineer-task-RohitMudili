@@ -1,0 +1,8 @@
+rag:
+  top_k: 8
+  rerank_k: 6
+  min_score: 0.35
+commenting:
+  mode: "inline"  # "aspose" if you have Aspose key
+output:
+  json_schema_path: "docs/output_schema.json"

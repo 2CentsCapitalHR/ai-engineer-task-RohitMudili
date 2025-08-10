@@ -1,0 +1,73 @@
+version: "v1"
+scope: "Employment Contract (ER 2024)"
+effective: "2025-04-01"
+rules:
+
+  missing_probation:
+    kind: "pattern_absence"
+    must_include:
+      - "probation"
+    message: "No probation clause found; confirm if probation applies and its length."
+    severity: "Medium"
+    applies_to_docs: ["Employment Contract"]
+    citations:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  missing_leave_entitlements:
+    kind: "pattern_absence"
+    must_include_any:
+      - "annual leave"
+      - "sick leave"
+      - "public holidays"
+    message: "Leave entitlements not clearly stated."
+    severity: "High"
+    applies_to_docs: ["Employment Contract"]
+    citations:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  unclear_overtime:
+    kind: "pattern_absence"
+    must_include_any:
+      - "overtime"
+      - "hours in excess"
+    message: "Overtime eligibility/rate basis not defined."
+    severity: "Medium"
+    applies_to_docs: ["Employment Contract"]
+    citations:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  missing_notice_termination:
+    kind: "pattern_absence"
+    must_include_any:
+      - "notice"
+      - "termination"
+    message: "Notice periods/termination terms missing or unclear."
+    severity: "High"
+    applies_to_docs: ["Employment Contract"]
+    citations:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"
+
+  work_permit_duties:
+    kind: "pattern_absence"
+    must_include_any:
+      - "work permit"
+      - "temporary work permit"
+      - "TWP"
+    message: "Work permit/TWP obligations not referenced."
+    severity: "Medium"
+    applies_to_docs: ["Employment Contract"]
+    citations:
+      - "https://www.adgm.com/setting-up"
+
+  data_protection_apd:
+    kind: "conditional_recommendation"
+    applies_if: "processes_special_category_data == true"
+    recommend_include:
+      - "Appropriate Policy Document"
+    message: "If special category data is processed, reference an APD under DPR 2021."
+    severity: "Advisory"
+    applies_to_docs:
+      - "Employment Contract"
+      - "HR Policy"
+    citations:
+      - "https://assets.adgm.com/download/assets/ADGM+DPR+2021+Appropriate+Policy+Document.pdf/7ecdbb96595d11efb0e3b2d1816cb4a4"

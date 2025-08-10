@@ -1,0 +1,28 @@
+process: "Company Incorporation"
+entity_type: "Private Company Limited by Shares (Non-Financial)"
+requirements:
+  - name: "Name Reservation"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+  - name: "Articles of Association"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"
+  - name: "Incorporation Application Form"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+  - name: "UBO Declaration Form"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/setting-up"
+  - name: "Register of Members and Directors"
+    mandatory: true
+    applies_if: "always"
+    sources:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"

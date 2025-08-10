@@ -1,0 +1,68 @@
+version: "v1"
+scope: "General Corporate Docs"
+rules:
+
+  jurisdiction_mismatch:
+    kind: "pattern_presence"
+    patterns_any:
+      - "UAE Federal Courts"
+      - "Dubai Courts"
+      - "Abu Dhabi Courts"
+    require_phrase: "ADGM"
+    message: "Jurisdiction clause does not reference ADGM laws/courts for an ADGM entity."
+    severity: "High"
+    applies_to_docs:
+      - "Articles of Association"
+      - "Shareholder Resolution"
+      - "Board Resolution"
+      - "Commercial Agreement"
+    citations:
+      - "https://en.adgm.thomsonreuters.com/rulebook/7-company-incorporation-package"
+
+  missing_signature_block:
+    kind: "structural_check"
+    checks:
+      - "has_signatory_name"
+      - "has_capacity"
+      - "has_signature_or_e-sign"
+      - "has_date"
+    message: "Missing signatory details or execution formalities."
+    severity: "Medium"
+    applies_to_docs: ["All"]
+    citations:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  register_missing:
+    kind: "doc_set_check"
+    requires_docs:
+      - "Register of Members and Directors"
+    message: "Registers not included for incorporation package."
+    severity: "High"
+    applies_if: "process == 'Company Incorporation'"
+    citations:
+      - "https://www.adgm.com/registration-authority/registration-and-incorporation"
+
+  guarantee_no_share_capital:
+    kind: "semantic_check"
+    trigger_if:
+      - "entity_type == 'Private Company Limited by Guarantee (Non-Financial)'"
+    forbidden_phrases:
+      - "share capital"
+      - "shares issued"
+    message: "Companies limited by guarantee must not have share capital."
+    severity: "High"
+    applies_to_docs:
+      - "Articles of Association"
+    citations:
+      - "https://assets.adgm.com/download/assets/Private+Company+Limited+by+Guarantee+Non-Financial+Services+20231228.pdf/1e6186444b1a11ef94edde7a1988e667"
+
+  template_non_compliance:
+    kind: "heuristic"
+    indicators_any:
+      - "Template fields left blank: [[...]] or ______"
+      - "Lorem ipsum"
+    message: "Template placeholders appear unfilled; document may be incomplete."
+    severity: "Low"
+    applies_to_docs: ["All"]
+    citations:
+      - "https://www.adgm.com/legal-framework/guidance-and-policy-statements"

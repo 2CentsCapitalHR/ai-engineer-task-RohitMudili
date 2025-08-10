@@ -1,0 +1,15 @@
+streamlit>=1.28.0
+chromadb>=0.4.0
+openai>=1.0.0
+pydantic>=2.0.0
+python-docx>=0.8.11
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+PyPDF2>=3.0.0
+pypdf>=3.15.0
+sentence-transformers>=2.2.0
+bge-reranker>=0.1.0
+pyyaml>=6.0
+python-dotenv>=1.0.0
+streamlit-option-menu>=0.3.0
+streamlit-file-browser>=0.1.0
